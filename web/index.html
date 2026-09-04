@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>trading-dashboard</title>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <header>
+    <h1>trading-dashboard</h1>
+    <p class="disclaimer">
+      ⚠️ Portefeuille <strong>simulé</strong>, aucun ordre réel exécuté. Les
+      indicateurs affichés sont des calculs mathématiques standard, pas des
+      conseils financiers. Données Stooq/synthétiques à but éducatif.
+    </p>
+  </header>
+
+  <main>
+    <section id="watchlist-section">
+      <h2>Suivi de ticker</h2>
+      <div class="row">
+        <input id="ticker-input" placeholder="ex: AAPL.US" value="AAPL.US" />
+        <button id="load-ticker">Charger</button>
+      </div>
+      <div id="quote-box"></div>
+      <canvas id="price-chart" height="200"></canvas>
+      <div id="indicators-box"></div>
+    </section>
+
+    <section id="portfolio-section">
+      <h2>Portefeuille (simulé)</h2>
+      <div class="row">
+        <input id="holding-ticker" placeholder="Ticker" />
+        <input id="holding-qty" placeholder="Quantité" type="number" step="any" />
+        <input id="holding-cost" placeholder="Prix de revient" type="number" step="any" />
+        <button id="add-holding">Ajouter / mettre à jour</button>
+      </div>
+      <table id="portfolio-table">
+        <thead>
+          <tr>
+            <th>Ticker</th><th>Qté</th><th>Prix revient</th><th>Prix actuel</th>
+            <th>Valeur</th><th>P&L</th><th>P&L %</th><th></th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+      <div id="portfolio-totals"></div>
+    </section>
+  </main>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

@@ -44,9 +44,14 @@ async function loadTicker(ticker) {
   ]);
 
   const changeClass = quote.change_percent >= 0 ? "positive" : "negative";
-  document.getElementById("quote-box").innerHTML =
-    `<strong>${quote.ticker}</strong> : ${quote.price.toFixed(2)} ` +
-    `<span class="${changeClass}">(${quote.change_percent.toFixed(2)}%)</span>`;
+  const quoteBox = document.getElementById("quote-box");
+  quoteBox.innerHTML = "";
+  const strong = document.createElement("strong");
+  strong.textContent = quote.ticker;
+  const span = document.createElement("span");
+  span.className = changeClass;
+  span.textContent = `(${quote.change_percent.toFixed(2)}%)`;
+  quoteBox.append(strong, ` : ${quote.price.toFixed(2)} `, span);
 
   drawPriceChart(document.getElementById("price-chart"), history);
 
@@ -61,14 +66,37 @@ async function loadPortfolio() {
   const tbody = document.querySelector("#portfolio-table tbody");
   tbody.innerHTML = "";
   for (const p of data.positions) {
+    // `p.ticker` vient d'une valeur saisie par l'utilisateur, persistée puis
+    // renvoyée telle quelle par l'API : on la place en `textContent`, jamais
+    // en `innerHTML`, pour ne pas rouvrir un XSS stocké (ex: un ticker du
+    // type `<img src=x onerror=...>`).
     const pnlClass = p.pnl >= 0 ? "positive" : "negative";
     const tr = document.createElement("tr");
-    tr.innerHTML =
-      `<td>${p.ticker}</td><td>${p.quantity}</td><td>${p.cost_basis.toFixed(2)}</td>` +
-      `<td>${p.current_price.toFixed(2)}</td><td>${p.market_value.toFixed(2)}</td>` +
-      `<td class="${pnlClass}">${p.pnl.toFixed(2)}</td>` +
-      `<td class="${pnlClass}">${p.pnl_percent.toFixed(1)}%</td>` +
-      `<td><button data-ticker="${p.ticker}" class="remove-btn">✕</button></td>`;
+
+    const cell = (text, className) => {
+      const td = document.createElement("td");
+      if (className) td.className = className;
+      td.textContent = text;
+      return td;
+    };
+
+    const removeBtn = document.createElement("button");
+    removeBtn.className = "remove-btn";
+    removeBtn.dataset.ticker = p.ticker;
+    removeBtn.textContent = "✕";
+    const actionCell = document.createElement("td");
+    actionCell.appendChild(removeBtn);
+
+    tr.append(
+      cell(p.ticker),
+      cell(String(p.quantity)),
+      cell(p.cost_basis.toFixed(2)),
+      cell(p.current_price.toFixed(2)),
+      cell(p.market_value.toFixed(2)),
+      cell(p.pnl.toFixed(2), pnlClass),
+      cell(`${p.pnl_percent.toFixed(1)}%`, pnlClass),
+      actionCell
+    );
     tbody.appendChild(tr);
   }
   document.getElementById("portfolio-totals").textContent =
